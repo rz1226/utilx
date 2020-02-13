@@ -4,7 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"tai/utilx/bm/mysqlx"
+	"strconv"
+	"unitollbill2db/utilx/bm/mysqlx"
 )
 
 // map数据映射到struct, 同名映射到struct的key不区分大小写，检查类型  。dstStruct是接收数据的struct的指针
@@ -71,16 +72,39 @@ func structFromQueryRes(sourceData map[string]interface{}, dstStruct interface{}
 			switch vType.Name() {
 			case "int64":
 				valueInt64, ok := valueFromMap.(int64)
+
 				if !ok {
-					return errors.New("field " + key + " can not store as integer ")
+					if valueStr, ok := valueFromMap.(string);ok{
+						valueInt64 , err := strconv.ParseInt(valueStr,10, 64)
+
+						if err == nil{
+
+							v.Elem().Field(i).Set(reflect.ValueOf(valueInt64))
+						}
+					}else{
+						return errors.New("field " + key + " can not store as integer , is "+ fmt.Sprint(reflect.TypeOf(valueFromMap)))
+					}
+
+				}else{
+					v.Elem().Field(i).Set(reflect.ValueOf(valueInt64))
 				}
-				v.Elem().Field(i).Set(reflect.ValueOf(valueInt64))
+
 			case "float64":
 				valueF64, ok := valueFromMap.(float64)
 				if !ok {
-					return errors.New("field " + key + " can not store as float ")
+					if valueStr, ok := valueFromMap.(string);ok{
+						valueInt64 , err := strconv.ParseFloat(valueStr, 64)
+						if err == nil{
+							v.Elem().Field(i).Set(reflect.ValueOf(valueInt64))
+						}
+					}else{
+						return errors.New("field " + key + " can not store as float ,is "+ fmt.Sprint(reflect.TypeOf(valueFromMap)))
+					}
+
+				}else{
+					v.Elem().Field(i).Set(reflect.ValueOf(valueF64))
 				}
-				v.Elem().Field(i).Set(reflect.ValueOf(valueF64))
+
 			case "string":
 				valueString, ok := valueFromMap.(string)
 				if !ok {

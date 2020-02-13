@@ -105,6 +105,7 @@ func queryResFromRows(rows *sql.Rows) (QueryRes, error) {
 			scanRes := make([]sql.Scanner, lengthRow)
 			for i := 0; i < lengthRow; i++ {
 				vType := columns[i].DatabaseTypeName()
+				//fmt.Println("vtype", columns[i],"2",vType )
 				switch vType {
 				case "INT", "BIGINT", "TINYINT", "MEDIUMINT":
 					scanRes[i] = &sql.NullInt64{}
