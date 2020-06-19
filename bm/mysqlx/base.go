@@ -82,4 +82,3 @@ func (p *DbPool) Begin() (*DbTx, error) {
 		return t, nil
 	}
 }
-

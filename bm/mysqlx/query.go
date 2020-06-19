@@ -6,8 +6,6 @@ import (
 	"reflect"
 )
 
-
-
 //   query的结果是QueryRes ，本质是一个map，可以批量修改，然后QueryRes 可以转化成Struct,可单个也可以批量。
 /**
 
@@ -38,7 +36,6 @@ mysqlx.Map2StructBatch(res , &u  )
 
 */
 
-
 /********************************************************************/
 //查询结果，数据结构, 可以用函数遍历,其内核是一个数组包着map， 其和普通数组map不同在于，可以用Map()遍历修改数据
 type QueryRes []map[string]interface{}
@@ -54,6 +51,7 @@ func (r QueryRes) Map(f func(map[string]interface{})) {
 		f(v)
 	}
 }
+
 /********************************************************************/
 //查询
 func (p *DbPool) Query(sqlStr string, args ...interface{}) (QueryRes, error) {
@@ -164,4 +162,3 @@ func fetchFromScanner(data sql.Scanner) interface{} {
 		return nil
 	}
 }
-

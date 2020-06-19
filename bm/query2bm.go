@@ -11,7 +11,7 @@ import (
 // map数据映射到struct, 同名映射到struct的key不区分大小写，检查类型  。dstStruct是接收数据的struct的指针
 //可以加多个struct接收数据, 一般只支持 整数，浮点，字符串
 // 第二个参数是struct 指针
-func BMFromQueryRes(sourceData map[string]interface{}, dstStruct interface{} , f func(  map[string]interface{}) ) error {
+func BMFromQueryRes(sourceData map[string]interface{}, dstStruct interface{}, f func(map[string]interface{})) error {
 	if f != nil {
 		f(sourceData)
 	}
@@ -23,18 +23,18 @@ func BMFromQueryRes(sourceData map[string]interface{}, dstStruct interface{} , f
 }
 
 //第二个参数是&[]*SomeStruct
-func BMFromQueryResBatch(sourceDatas mysqlx.QueryRes, dstStructs interface{}, f func(  map[string]interface{})) ( error) {
+func BMFromQueryResBatch(sourceDatas mysqlx.QueryRes, dstStructs interface{}, f func(map[string]interface{})) error {
 	strusRV := reflect.Indirect(reflect.ValueOf(dstStructs))
 	elemRT := strusRV.Type().Elem()
-	for _, v := range sourceDatas{
-		eleData := reflect.New( elemRT.Elem() ).Interface()
-		err := BMFromQueryRes(v, eleData, f )
+	for _, v := range sourceDatas {
+		eleData := reflect.New(elemRT.Elem()).Interface()
+		err := BMFromQueryRes(v, eleData, f)
 		if err != nil {
 			return err
 		}
-		strusRV = reflect.Append(strusRV, reflect.ValueOf(eleData) )
+		strusRV = reflect.Append(strusRV, reflect.ValueOf(eleData))
 	}
-	reflect.Indirect(reflect.ValueOf( dstStructs)).Set(strusRV)
+	reflect.Indirect(reflect.ValueOf(dstStructs)).Set(strusRV)
 	return nil
 }
 
@@ -57,7 +57,7 @@ func structFromQueryRes(sourceData map[string]interface{}, dstStruct interface{}
 	case reflect.Ptr:
 		for i := 0; i < v.Elem().NumField(); i++ {
 			//oriKey := t.Field(i).Name
-			key := t.Field(i).Tag.Get( Conf.TagName)
+			key := t.Field(i).Tag.Get(Conf.TagName)
 
 			if len(key) == 0 {
 				//找不到业务模型struct的数据库映射tag,忽略
@@ -74,34 +74,34 @@ func structFromQueryRes(sourceData map[string]interface{}, dstStruct interface{}
 				valueInt64, ok := valueFromMap.(int64)
 
 				if !ok {
-					if valueStr, ok := valueFromMap.(string);ok{
-						valueInt64 , err := strconv.ParseInt(valueStr,10, 64)
+					if valueStr, ok := valueFromMap.(string); ok {
+						valueInt64, err := strconv.ParseInt(valueStr, 10, 64)
 
-						if err == nil{
+						if err == nil {
 
 							v.Elem().Field(i).Set(reflect.ValueOf(valueInt64))
 						}
-					}else{
-						return errors.New("field " + key + " can not store as integer , is "+ fmt.Sprint(reflect.TypeOf(valueFromMap)))
+					} else {
+						return errors.New("field " + key + " can not store as integer , is " + fmt.Sprint(reflect.TypeOf(valueFromMap)))
 					}
 
-				}else{
+				} else {
 					v.Elem().Field(i).Set(reflect.ValueOf(valueInt64))
 				}
 
 			case "float64":
 				valueF64, ok := valueFromMap.(float64)
 				if !ok {
-					if valueStr, ok := valueFromMap.(string);ok{
-						valueInt64 , err := strconv.ParseFloat(valueStr, 64)
-						if err == nil{
+					if valueStr, ok := valueFromMap.(string); ok {
+						valueInt64, err := strconv.ParseFloat(valueStr, 64)
+						if err == nil {
 							v.Elem().Field(i).Set(reflect.ValueOf(valueInt64))
 						}
-					}else{
-						return errors.New("field " + key + " can not store as float ,is "+ fmt.Sprint(reflect.TypeOf(valueFromMap)))
+					} else {
+						return errors.New("field " + key + " can not store as float ,is " + fmt.Sprint(reflect.TypeOf(valueFromMap)))
 					}
 
-				}else{
+				} else {
 					v.Elem().Field(i).Set(reflect.ValueOf(valueF64))
 				}
 
@@ -113,7 +113,7 @@ func structFromQueryRes(sourceData map[string]interface{}, dstStruct interface{}
 				}
 				v.Elem().Field(i).Set(reflect.ValueOf(valueString))
 			default:
-				return errors.New("only support int64, float64, string  "   )
+				return errors.New("only support int64, float64, string  ")
 			}
 		}
 		return nil
@@ -121,4 +121,3 @@ func structFromQueryRes(sourceData map[string]interface{}, dstStruct interface{}
 		return errors.New("only support struct pointer")
 	}
 }
-
